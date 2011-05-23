@@ -1,5 +1,6 @@
 use strict;
 use warnings;
+
 package Business::BR::RG;
 
 use 5.004;
@@ -16,80 +17,79 @@ our $VERSION = 0.001;
 #our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 #our @EXPORT = qw();
 
-
 our @EXPORT_OK = qw( canon_rg format_rg parse_rg random_rg );
-our @EXPORT = qw( test_rg );
+our @EXPORT    = qw( test_rg );
 
 # tambem tive que copiar o _dot do Business::BR::Ids::Common pois o valor de X é 10
 sub _dot {
-	my $a = shift;
-	my $b = shift;
-	warn "arguments a and b should have the same length"
-		unless (@$a==@$b);
-	my $s = 0;
-	my $c  = @$a;
-	for my $i ( 0 .. $c ) {
-		my ($x, $y) = ($a->[$i], $b->[$i]);
-		if ($x && $y) {
-			$y = 10 if ($y eq 'X');
+    my $a = shift;
+    my $b = shift;
+    warn "arguments a and b should have the same length"
+      unless ( @$a == @$b );
+    my $s = 0;
+    my $c = @$a;
+    for my $i ( 0 .. $c ) {
+        my ( $x, $y ) = ( $a->[$i], $b->[$i] );
+        if ( $x && $y ) {
+            $y = 10 if ( $y eq 'X' );
 
-			$s += $x * $y;
-		}
-	}
-	return $s;
+            $s += $x * $y;
+        }
+    }
+    return $s;
 }
 
 # o RG tem pode ter o digito X que representa o numero 10, portanto, nao pude usar o
 # _canon_id do Business::BR::Ids::Common
 # the RG may have an X, thats represents 10, because of this, I use self functions for _dot and for clean
 sub canon_rg {
-	my $rg = uc shift();
+    my $rg = uc shift();
 
-	if ($rg){
+    if ($rg) {
 
-		$rg =~ s/[^X\d]//go;
+        $rg =~ s/[^X\d]//go;
 
-		if (length($rg) == 9){
-			return $rg;
-		}else{
-			return sprintf('%0*s', 9, $rg);
-		}
+        if ( length($rg) == 9 ) {
+            return $rg;
+        }
+        else {
+            return sprintf( '%0*s', 9, $rg );
+        }
 
-	}else{
-		return undef;
-	}
+    }
+    else {
+        return undef;
+    }
 }
-
 
 # there is a subtle difference here between the return for
 # for an input which is not 9 digits long (undef)
 # and one that does not satisfy the check equations (0).
 # Correct RG numbers return 1.
 sub test_rg {
-	my $rg = canon_rg shift;
-	return undef if length $rg != 9;
+    my $rg = canon_rg shift;
+    return undef if length $rg != 9;
 
-	my @rg = split '', $rg;
+    my @rg = split '', $rg;
 
-	my $mod = _dot([2, 3, 4, 5, 6, 7, 8, 9, 100], \@rg) % 11;
+    my $mod = _dot( [ 2, 3, 4, 5, 6, 7, 8, 9, 100 ], \@rg ) % 11;
 
-	return $mod == 0  ? 1 : 0;
+    return $mod == 0 ? 1 : 0;
 }
 
-
 sub format_rg {
-	my $rg = canon_rg shift;
-	$rg =~ s/^(..)(...)(...)(.)/$1.$2.$3-$4/;
-	return $rg;
+    my $rg = canon_rg shift;
+    $rg =~ s/^(..)(...)(...)(.)/$1.$2.$3-$4/;
+    return $rg;
 }
 
 sub parse_rg {
-	my $rg = canon_rg shift;
-	my ($base, $dv) = $rg =~ /(\d{8})(\d|X)/;
-	if (wantarray) {
-		return ($base, $dv);
-	}
-	return { base => $base, dv => $dv };
+    my $rg = canon_rg shift;
+    my ( $base, $dv ) = $rg =~ /(\d{8})(\d|X)/;
+    if (wantarray) {
+        return ( $base, $dv );
+    }
+    return { base => $base, dv => $dv };
 }
 
 # computes the check digits of the candidate RG number given as argument
@@ -98,27 +98,28 @@ sub parse_rg {
 # In list context, it returns the check digit.
 # In scalar context, it returns the complete RG (base and check digit)
 sub _dv_rg {
-	my $base = shift; # expected to be canon'ed already ?!
-	my $valid = @_ ? shift : 1;
-	my $dev = $valid ? 0 : 2; # deviation (to make RG invalid)
+    my $base  = shift;             # expected to be canon'ed already ?!
+    my $valid = @_ ? shift : 1;
+    my $dev   = $valid ? 0 : 2;    # deviation (to make RG invalid)
 
-	my @base = split '', substr($base, 0, 8);
+    my @base = split '', substr( $base, 0, 8 );
 
-	my $dv = ( -_dot([2, 3, 4, 5, 6, 7, 8, 9], \@base ) + $dev) % 11 % 10;
+    my $dv = ( -_dot( [ 2, 3, 4, 5, 6, 7, 8, 9 ], \@base ) + $dev ) % 11 % 10;
 
-	if ($dv == 0 && $valid && test_rg($base . $dv) == 0){
-		$dv = 'X';
-	}
+    if ( $dv == 0 && $valid && test_rg( $base . $dv ) == 0 ) {
+        $dv = 'X';
+    }
 
-	return ($dv) if wantarray;
+    return ($dv) if wantarray;
 
-	if (length($base) == 9){
-		substr($base, 9, 1) = $dv;
-	}else{
-		$base .= $dv;
-	}
+    if ( length($base) == 9 ) {
+        substr( $base, 9, 1 ) = $dv;
+    }
+    else {
+        $base .= $dv;
+    }
 
-	return $base;
+    return $base;
 }
 
 # generates a random (correct or incorrect) RG
@@ -127,11 +128,11 @@ sub _dv_rg {
 #
 # if $valid==0, produces an invalid .  RG
 sub random_rg {
-	my $valid = @_ ? shift : 1; # valid RG by default
+    my $valid = @_ ? shift : 1;    # valid RG by default
 
-	my $base = sprintf '%08s', int(rand(1E8)); # 8 dígitos
+    my $base = sprintf '%08s', int( rand(1E8) );    # 8 dígitos
 
-	return scalar _dv_rg($base, $valid);
+    return scalar _dv_rg( $base, $valid );
 }
 
 1;

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Perl module to test for correct RG numbers",
+   "author" : [
+      "Renato CRON <rentocron@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Business-BR-RG",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : 0,
+            "perl" : "5.004"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/renatocron/Business--BR--RG/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://renatocron@github.com/renatocron/Business--BR--RG.git",
+         "web" : "http://github.com/renatocron/Business--BR--RG"
+      }
+   },
+   "version" : "0.001"
+}
+
