@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Business::BR::RG;
 
-use 5;
+use 5.004;
 use strict;
 use warnings;
 
@@ -16,8 +16,6 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw( canon_rg format_rg parse_rg random_rg );
 our @EXPORT = qw( test_rg );
-
-our $VERSION = '0.0001';
 
 # tambem tive que copiar o _dot do Business::BR::Ids::Common pois o valor de X é 10
 sub _dot {
