@@ -144,10 +144,32 @@ Business::BR::RG - Perl module to test for correct RG numbers
 
 =head1 SYNOPSIS
 
-use Business::BR::RG;
+basic use
 
-print "ok " if test_rg('390.533.447-05'); # prints 'ok '
-print "bad " unless test_rg('231.002.999-00'); # prints 'bad '
+	use Business::BR::RG;
+
+	print "ok " if test_rg('390.533.447-05'); # prints 'ok '
+	print "bad " unless test_rg('231.002.999-00'); # prints 'bad '
+
+using all methods
+
+	use Business::BR::RG qw /canon_rg test_rg random_rg format_rg parse_rg/;
+
+	test_rg('48.391.390-x') # 1
+	canon_rg('11.456.789-x') # '11456789X'
+
+	test_rg('48.190.390-X') # 0
+
+	test_rg('48.190') # undef
+
+	format_rg('48.19.0.3.9.0.X') # '48.190.390-X'
+
+	my ($base, $dv) = parse_rg('48.19.0.3.9.0.X');
+	print $base # '48190390'
+	print $dv   # 'X'
+
+	my $hashref = parse_rg('48.19.0.3.9.0.X');
+	print $hashref->{base} . '-' . $hashref->{dv}; # 48190390-X
 
 =head1 DESCRIPTION
 
@@ -155,10 +177,11 @@ The RG number is an identification number of Brazilian citizens
 emitted by the Department of Public Safety, which is called
 "Secretaria de Segurança Pública (SSP)".
 
-RG stands for "Cadastro Geral" because is valid in all brazil territory.
+RG stands for "Registro Geral", and it is valid for all brazil territory.
 May be use as passport to Argentina, Paraguay, Uruguay and Chile.
 
 The RG is comprised of a base of 8 digits and one check digit.
+
 It is usually written like '12.002.999-0' so as to be
 more human-readable.
 
@@ -186,9 +209,9 @@ Except the letter X, because it's represents the number 10.
 
 =item B<test_rg>
 
-test_rg('39.985.676-X') # incorrect RG, returns 0
-test_rg(' 39.985.676-6 ') # is ok, returns 1
-test_rg('123') # nope, returns undef
+	test_rg('39.985.676-X') # incorrect RG, returns 0
+	test_rg(' 39.985.676-6 ') # is ok, returns 1
+	test_rg('123') # nope, returns undef
 
 Tests whether a RG number is correct. Before testing,
 any non-digit [except X, no matter its case] character is stripped.
@@ -201,26 +224,25 @@ The policy to get rid of '.' and '-' is very liberal.
 It indeeds discards anything that is not a digit (0, 1, ..., 9, or X)
 or letter. That is handy for discarding spaces as well
 
-test_rg(' 39.985.676-6 ') # is ok, returns 1
+	test_rg(' 39.985.676-6 ') # is ok, returns 1
 
 But extraneous inputs like '3.9.9 8w5.6w7h6?6' are
 also accepted. If you are worried about this kind of input,
 just check against a regex:
 
-warn "bad RG: only digits (9) expected"
-	unless ($rg =~ /^\d{8}(\d|x)$/i);
+	warn "bad RG: only digits (9) expected"
+		unless ($rg =~ /^\d{8}(\d|x)$/i);
 
-warn "bad RG: does not match mask '__.___.___-_'"
-	unless ($rg =~ /^\d{2}\.\d{3}\.\d{3}-(\d|x)$/i);
+	warn "bad RG: does not match mask '__.___.___-_'"
+		unless ($rg =~ /^\d{2}\.\d{3}\.\d{3}-(\d|x)$/i);
 
 NOTE. Integer numbers like 1234567
-with fewer than 8 digits will be normalized (eg. to
-"001234567") before testing.
+with fewer than 8 digits will be normalized (eg. to "001234567") before testing.
 
 =item B<canon_rg>
 
-canon_rg(99); # returns '000000099'
-canon_rg('99.999.999-9'); # returns '999999999'
+	canon_rg(99); # returns '000000099'
+	canon_rg('99.999.999-9'); # returns '999999999'
 
 Brings a candidate for a RG number to a canonical form.
 In case,
@@ -230,7 +252,7 @@ non-alphanumeric [again, except x] characters and returned as it is.
 
 =item B<format_rg>
 
-format_rg('00000000'); # returns '00.000.000-0'
+	format_rg('00000000'); # returns '00.000.000-0'
 
 Formats its input into '00.000.000-0' mask.
 First, the argument is canon'ed and then
@@ -240,8 +262,8 @@ So you can call format_rg even when its already formated.
 
 =item B<parse_rg>
 
-($base, $dv) = parse_rg($rg);
-$hashref = parse_rg('99.222.111-0'); # { base => '99222111', dv => '0' }
+	($base, $dv) = parse_rg($rg);
+	$hashref = parse_rg('99.222.111-0'); # { base => '99222111', dv => '0' }
 
 Splits a candidate for RG number into base and check
 digits (dv - dígitos de verificação). It canon's
@@ -253,11 +275,11 @@ with keys 'base' and 'dv' and associated values.
 
 =item B<random_rg>
 
-$rand_rg = random_rg($valid);
+	$rand_rg = random_rg($valid);
 
-$correct_rg = random_rg();
-$rg = random_rg(1); # also a correct RG
-$bad_rg = random_rg(0); # an incorrect RG
+	$correct_rg = random_rg();
+	$rg = random_rg(1); # also a correct RG
+	$bad_rg = random_rg(0); # an incorrect RG
 
 Generates a random RG. If $valid is omitted or 1, it is guaranteed
 to be I<correct>. If $valid is 0, it is guaranteed to be I<incorrect>.

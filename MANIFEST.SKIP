@@ -1,2 +1,5 @@
 .git/
 dist.ini
+.build
+Business*
+*.tar.gz
