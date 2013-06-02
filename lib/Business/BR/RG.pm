@@ -56,9 +56,8 @@ sub canon_rg {
 			return sprintf('%0*s', 9, $rg);
 		}
 
-	}else{
-		return undef;
 	}
+	return undef;
 }
 
 
