@@ -2,6 +2,7 @@ use strict;
 use warnings;
 package Business::BR::RG;
 
+
 use 5.004;
 use strict;
 use warnings;
@@ -136,15 +137,14 @@ sub random_rg {
 
 1;
 
-__END__
+
+=pod
 
 =head1 NAME
 
 Business::BR::RG - Perl module to test for correct RG numbers
 
-=head1 SYNOPSIS
-
-basic use
+ABSTRACT:
 
 	use Business::BR::RG;
 
